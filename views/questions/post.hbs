@@ -1,0 +1,27 @@
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card bg-dark text-white rounded" style="border-radius: 1rem;">
+                <div class="card-body text-white">
+                    <h2 class="fw-bold mb-2 text-uppercase text-center">Post a question</h2>
+                    <form action="/questions/post" method="post">
+
+                        <div data-mdb-input-init class="form-outline mb-4">
+                            <input type="text" class="form-control text-white" id="title" name="title" />
+                            <label class="form-label text-white" for="title">Title</label>
+                        </div>
+
+                        <div data-mdb-input-init class="form-outline mb-4">
+                            <textarea class="form-control text-white" id="description" name="description" rows="3"></textarea>
+                            <label class="form-label text-white" for="description">Description</label>
+                        </div>
+
+                        <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block">
+                            Submit
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

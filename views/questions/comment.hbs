@@ -1,0 +1,13 @@
+<div class="container">
+    <form action="/questions/{{qid}}/comment" method="post">
+        <div class="form-row align-items-center">
+            <div class="col-auto">
+                <label class="sr-only" for="inlineFormInput">Description</label>
+                <textarea type="text" class="form-control mb-2 bg-dark text-white" required name="description" id="inlineFormInput" placeholder="This is the answer" style="border-radius: 0.5rem;"></textarea>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary mb-2" style="border-radius: 0.5rem;">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>

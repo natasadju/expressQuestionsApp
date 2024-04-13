@@ -1,0 +1,45 @@
+<!--
+<div class="container py-2">
+    <div class="row">
+        {{#each questions}}
+            <div class="col-md-6">
+                <div class="card bg-dark text-white mb-4 shadow" style="border-radius: 1rem; border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;"> &lt;!&ndash; Added border-radius &ndash;&gt;
+                    <div class="card-body">
+                        <h2 class="fw-bold mb-3 text-uppercase">{{this.title}}</h2>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">{{this.datetime}}</small>
+                            <a href="/questions/{{this._id}}" class="btn btn-outline-light btn-sm">View</a> &lt;!&ndash; Moved View button to the right &ndash;&gt;
+                        </div>
+                    </div>
+                    <div class="card-footer bg-dark d-flex align-items-center">
+                        <img src="/images/{{this.userid.photo_path}}" height="30" width="30" class="rounded-circle mr-3" alt="No Photo">
+                        <span class="text-white">{{this.userid.username}}</span>
+                    </div>
+                </div>
+            </div>
+        {{/each}}
+    </div>
+</div>
+-->
+
+<div class="container-fluid py-1">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="list-group">
+                {{#each questions}}
+                    <div href="/questions/{{this._id}}" class="list-group-item list-group-item-action bg-dark text-white mb-2 shadow" style="border-radius: 1rem;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="fw-bold mb-0">{{this.title}}</h2>
+                            <a href="/questions/{{this._id}}" class="btn btn-outline-light btn-sm">View</a> <!-- Moved View button to the right -->
+                        </div>
+                        <small class="text-muted">{{this.datetime}}</small>
+                        <div class="d-flex align-items-center mt-2">
+                            <img src="/images/{{this.userid.photo_path}}" height="30" width="30" class="rounded-circle mr-3" alt="No Photo">
+                            <span class="text-white">{{this.userid.username}}</span>
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
+        </div>
+    </div>
+</div>

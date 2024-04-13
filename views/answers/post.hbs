@@ -1,0 +1,22 @@
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card bg-dark text-white rounded" style="border-radius: 1rem;">
+                <div class="card-body text-white">
+                    <h2 class="fw-bold mb-2 text-uppercase text-center">Post an answer</h2>
+                    <form action="/answers/{{qid}}/post" method="post">
+
+                        <div data-mdb-input-init class="form-outline mb-4">
+                            <textarea class="form-control text-white" required name="description" rows="4" placeholder="This is the answer"></textarea>
+                            <label class="form-label text-white" for="inlineFormInput">Description</label>
+                        </div>
+
+                        <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block">
+                            Submit
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

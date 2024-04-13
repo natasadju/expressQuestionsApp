@@ -1,0 +1,205 @@
+<style>
+    .card-container {
+        border-radius: 1rem;
+    }
+
+    .user-photo {
+        height: 30px;
+        width: 30px;
+    }
+
+    .vote-btn {
+        font-weight: 800;
+        font-size: 18px;
+    }
+
+    .comment-text {
+        font-size: 12px;
+    }
+
+    .correct-answer-card {
+        background-color: #cce6ff;
+    }
+
+    /* Bluish color */
+    .answer-card-body {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    /* Adjust height as needed */
+</style>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9">
+            <div class="card mb-4 box-shadow bg-dark text-white card-container">
+                <div class="card-body">
+                    <h3>{{data.title}}</h3>
+                    <p class="card-text">{{data.description}}</p>
+                    <p><small class="text-muted">{{data.datetime}}</small></p>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <!-- Added d-flex, justify-content-between, align-items-center -->
+                        <div>
+                            <img src="/images/{{data.userid.photo_path}}" class="rounded user-photo" alt="No Photo">
+                            {{data.userid.username}}
+                        </div>
+                        {{#if loggedIn}}
+                            <div class="d-flex align-items-center"> <!-- Added d-flex, align-items-center -->
+                                {{#if questionOwner}}
+                                    <form class="d-inline" action="/questions/{{data._id}}/delete" method="post">
+                                        <!-- Removed pl-2 -->
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                {{/if}}
+                                <a href="/answers/{{data._id}}/post" class="btn btn-success ml-2">Answer</a>
+                                <!-- Added ml-2 for spacing -->
+                                <a href="/questions/{{data._id}}/comment" class="btn btn-info ml-2">Comment</a>
+                                <!-- Added ml-2 for spacing -->
+                            </div>
+                        {{/if}}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <h4>Comments</h4>
+                    {{#each data.comments}}
+                        <span class="d-block text-white comment-text">{{this}}</span>
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="text-center"><h2 class="text-white">Answers</h2></div>
+
+    {{#if correctAnswer}}
+        <!-- Check if the correct answer exists -->
+        <div class="row justify-content-center p-5 pt-0 pb-0">
+            <div class="col-md-7">
+                <div class="card mb-4 box-shadow correct-answer-card">
+                    <div class="card-body answer-card-body">
+                        <p class="card-text">{{correctAnswer.description}}</p>
+                        <p><small class="text-muted">{{correctAnswer.datetime}}</small></p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <img src="/images/{{correctAnswer.uid.photo_path}}" class="rounded user-photo"
+                                     alt="No Photo">
+                                {{correctAnswer.uid.username}}
+                                <span class="ml-2 text-success">{{correctAnswerUPVotes}}</span>/<span
+                                    class="text-danger">{{correctAnswerDOWNVotes}}</span>
+                            </div>
+
+                            {{#if loggedIn}}
+
+                                <div class="d-flex align-items-center">
+                                    {{#if correctAnswer.answerOwner}}
+
+                                        <form class="d-inline" action="/answers/{{correctAnswer._id}}/delete"
+                                              method="post">
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    {{/if}}
+                                    <a href="/answers/{{correctAnswer._id}}/comment"
+                                       class="btn btn-info ml-2">Comment</a>
+                                    <form class="d-inline" action="/answers/{{correctAnswer._id}}/vote" method="post">
+                                        <button class="btn {{#if
+                                                correctAnswer.votedPositively}}btn-success{{else}}btn-outline-success{{/if}} btn-sm vote-btn"
+                                                type="submit">
+                                            <i class="far fa-thumbs-up {{#if
+                                                    correctAnswer.votedPositively}}fas{{/if}}"></i>
+                                        </button>
+                                        <input type="hidden" name="vote" value="upvote">
+                                    </form>
+                                    <form class="d-inline" action="/answers/{{correctAnswer._id}}/vote" method="post">
+                                        <button class="btn {{#if
+                                                correctAnswer.votedNegatively}}btn-danger{{else}}btn-outline-danger{{/if}} btn-sm vote-btn"
+                                                type="submit">
+                                            <i class="far fa-thumbs-down {{#if
+                                                    correctAnswer.votedNegatively}}fas{{/if}}"></i>
+                                        </button>
+                                        <input type="hidden" name="vote" value="downvote">
+                                    </form>
+                                </div>
+                            {{/if}}
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <h4>Comments</h4>
+                        {{#each correctAnswer.comments}}
+                            <span class="d-block text-white comment-text">{{this}}</span>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{/if}}
+
+
+
+
+    <<!--Svi odgovori -->
+    {{#each answers}}
+        <div class="row justify-content-center p-5 pt-0 pb-0">
+            <div class="col-md-7">
+                <div class="card mb-4 box-shadow bg-dark text-white">
+                    <div class="card-body answer-card-body">
+                        <p class="card-text">{{this.description}}</p>
+                        <p><small class="text-muted">{{this.datetime}}</small></p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <img src="/images/{{this.uid.photo_path}}" class="rounded user-photo" alt="No Photo">
+                                {{this.uid.username}}
+                                <span class="ml-2 text-success">{{this.upvotes}}</span>/<span
+                                    class="text-danger">{{this.downvotes}}</span>
+                            </div>
+                            {{#if this.loggedIn}}
+                                <div class="d-flex align-items-center">
+                                    {{#if this.answerOwner}}
+                                        <form class="d-inline pl-2" action="/answers/{{this._id}}/delete" method="post">
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    {{/if}}
+                                    <a href="/answers/{{this._id}}/comment" class="btn btn-info ml-2">Comment</a>
+                                    {{#if this.questionOwner}}
+                                        <form class="d-inline pl-2" action="/answers/{{this._id}}/update" method="post">
+                                            <button type="submit" class="btn btn-success">Correct</button>
+                                        </form>
+                                    {{/if}}
+                                    <form class="d-inline" action="/answers/{{this._id}}/vote" method="post">
+                                        <button class="btn {{#if
+                                                this.votedPositively}}btn-success{{else}}btn-outline-success{{/if}} btn-sm vote-btn"
+                                                type="submit">
+                                            <i class="far fa-thumbs-up {{#if this.votedPositively}}fas{{/if}}"></i>
+                                        </button>
+                                        <input type="hidden" name="vote" value="upvote">
+                                    </form>
+                                    <form class="d-inline" action="/answers/{{this._id}}/vote" method="post">
+                                        <button class="btn {{#if
+                                                this.votedNegatively}}btn-danger{{else}}btn-outline-danger{{/if}} btn-sm vote-btn"
+                                                type="submit">
+                                            <i class="far fa-thumbs-down {{#if this.votedNegatively}}fas{{/if}}"></i>
+                                        </button>
+                                        <input type="hidden" name="vote" value="downvote">
+                                    </form>
+                                </div>
+                            {{/if}}
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <h4>Comments</h4>
+                        {{#each this.comments}}
+                            <span class="d-block text-white comment-text">{{this}}</span>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{/each}}
+
+
+</div>
