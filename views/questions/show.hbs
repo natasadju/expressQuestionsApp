@@ -41,23 +41,19 @@
                 </div>
                 <div class="card-footer">
                     <div class="d-flex justify-content-between align-items-center">
-                        <!-- Added d-flex, justify-content-between, align-items-center -->
                         <div>
                             <img src="/images/{{data.userid.photo_path}}" class="rounded user-photo" alt="No Photo">
-                            {{data.userid.username}}
+                            <a href="/users/{{data.userid.username}}">{{data.userid.username}}</a>
                         </div>
                         {{#if loggedIn}}
                             <div class="d-flex align-items-center"> <!-- Added d-flex, align-items-center -->
                                 {{#if questionOwner}}
                                     <form class="d-inline" action="/questions/{{data._id}}/delete" method="post">
-                                        <!-- Removed pl-2 -->
                                         <button type="submit" class="btn btn-danger">Delete</button>
                                     </form>
                                 {{/if}}
                                 <a href="/answers/{{data._id}}/post" class="btn btn-success ml-2">Answer</a>
-                                <!-- Added ml-2 for spacing -->
                                 <a href="/questions/{{data._id}}/comment" class="btn btn-info ml-2">Comment</a>
-                                <!-- Added ml-2 for spacing -->
                             </div>
                         {{/if}}
                     </div>
@@ -74,7 +70,6 @@
     <div class="text-center"><h2 class="text-white">Answers</h2></div>
 
     {{#if correctAnswer}}
-        <!-- Check if the correct answer exists -->
         <div class="row justify-content-center p-5 pt-0 pb-0">
             <div class="col-md-7">
                 <div class="card mb-4 box-shadow correct-answer-card">
@@ -87,7 +82,7 @@
                             <div>
                                 <img src="/images/{{correctAnswer.uid.photo_path}}" class="rounded user-photo"
                                      alt="No Photo">
-                                {{correctAnswer.uid.username}}
+                                <a href="/users/{{correctAnswer.uid.username}}"> {{correctAnswer.uid.username}}</a>
                                 <span class="ml-2 text-success">{{correctAnswerUPVotes}}</span>/<span
                                     class="text-danger">{{correctAnswerDOWNVotes}}</span>
                             </div>
@@ -129,7 +124,7 @@
                     <div class="card-footer">
                         <h4>Comments</h4>
                         {{#each correctAnswer.comments}}
-                            <span class="d-block text-white comment-text">{{this}}</span>
+                            <span class="d-block text-black comment-text">{{this}}</span>
                         {{/each}}
                     </div>
                 </div>
@@ -138,9 +133,6 @@
     {{/if}}
 
 
-
-
-    <<!--Svi odgovori -->
     {{#each answers}}
         <div class="row justify-content-center p-5 pt-0 pb-0">
             <div class="col-md-7">
@@ -153,7 +145,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <img src="/images/{{this.uid.photo_path}}" class="rounded user-photo" alt="No Photo">
-                                {{this.uid.username}}
+                                <a href="/users/{{this.uid.username}}"> {{this.uid.username}}</a>
                                 <span class="ml-2 text-success">{{this.upvotes}}</span>/<span
                                     class="text-danger">{{this.downvotes}}</span>
                             </div>

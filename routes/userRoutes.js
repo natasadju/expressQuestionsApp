@@ -23,12 +23,12 @@ function requiresLogin(req, res, next) {
 router.get('/', userController.list);
 router.get('/login', userController.showLogin);
 router.get('/register', userController.showRegister);
-router.get('/profile', requiresLogin, userController.showProfile);
+router.get('/profile/', requiresLogin, userController.showProfile);
 router.get('/logout', userController.logout);
 /*
  * GET
  */
-router.get('/:id', userController.show);
+router.get('/:username', userController.showProfile);
 
 /*
  * POST

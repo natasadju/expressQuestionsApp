@@ -12,7 +12,6 @@ module.exports = {
      * questionController.list()
      */
     list: function (req, res) {
-        const loggedIn = req.session.userId ? true : false;
         QuestionModel.find()
             .populate('userid')
             .sort({datetime: 'desc'})
@@ -23,7 +22,7 @@ module.exports = {
                         error: err
                     });
                 }
-                return res.render('questions/list', {questions: questions, loggedIn: loggedIn});
+                return res.render('questions/list', {questions: questions});
             });
     },
 
@@ -103,16 +102,14 @@ module.exports = {
     },
 
     showAddQuestion: function (req, res) {
-        const loggedIn = req.session.userId ? true : false;
 
-        return res.render('questions/post', {loggedIn: loggedIn});
+        return res.render('questions/post');
     },
 
     /**
      * questionController.create()
      */
     create: async function (req, res) {
-        const loggedIn = req.session.userId ? true : false;
 
         var question = new QuestionModel({
             title: req.body.title,
@@ -125,7 +122,7 @@ module.exports = {
 
         await question.save();
 
-        return res.render('feedback', {message: "Question posted successfully!", loggedIn: loggedIn});
+        return res.render('feedback', {message: "Question posted successfully!"});
     },
 
     /**
@@ -172,7 +169,6 @@ module.exports = {
      */
     remove: function (req, res) {
         var id = req.params.id;
-        const loggedIn = req.session.userId ? true : false;
 
         QuestionModel.findByIdAndRemove(id, function (err, question) {
             if (err) {
@@ -182,12 +178,11 @@ module.exports = {
                 });
             }
 
-            return res.render('feedback', {message: 'Question deleted successfully!', loggedIn: loggedIn});
+            return res.render('feedback', {message: 'Question deleted successfully!'});
         });
     },
 
     myquestions: function (req, res) {
-        const loggedIn = req.session.userId ? true : false;
         var query = {userid: req.session.userId};
         QuestionModel.find(query)
             .populate('userid')
@@ -200,15 +195,13 @@ module.exports = {
                     });
                 }
                 if (questions.length === 0) {
-                    return res.render('error', {message: 'No posted questions!', error: '', loggedIn: loggedIn});
+                    return res.render('error', {message: 'No posted questions!', error: ''});
                 }
-                return res.render('questions/list', {questions: questions, loggedIn: loggedIn});
+                return res.render('questions/list', {questions: questions});
             });
     },
 
     hotquestions: function (req, res) {
-        const loggedIn = req.session.userId ? true : false;
-
         const dayAgo = new Date();
         dayAgo.setDate(dayAgo.getDate() - 1);
 
@@ -230,7 +223,7 @@ module.exports = {
                     });
                 }
 
-                return res.render('questions/list', { questions: hotQuestions, loggedIn: loggedIn });
+                return res.render('questions/list', { questions: hotQuestions});
             });
     },
 
@@ -239,18 +232,16 @@ module.exports = {
     showPostComment: async function (req, res) {
 
         var id = req.params.id;
-        const loggedIn = req.session.userId ? true : false;
-        return res.render('questions/comment', {qid: id, loggedIn: loggedIn})
+        return res.render('questions/comment', {qid: id})
 
     },
 
     postComment: async function (req, res) {
-        const loggedIn = req.session.userId ? true : false;
         var id = req.params.id;
 
         await QuestionModel.findOneAndUpdate({_id: id}, {$push: {comments: req.body.description}});
 
-        return res.render('feedback', {message: "Comment published successfully!", loggedIn: loggedIn})
+        return res.render('feedback', {message: "Comment published successfully!"})
 
     },
 

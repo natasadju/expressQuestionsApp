@@ -77,16 +77,15 @@ module.exports = {
             comments: []
         });
 
-        answer.save(function (err, answer) {
-            if (err) {
-                return res.status(500).json({
-                    message: 'Error when creating answer',
-                    error: err
-                });
-            }
-
+        try {
+            await answer.save();
             return res.redirect(`/questions/${id}`);
-        });
+        } catch (err) {
+            return res.status(500).json({
+                message: 'Error when creating answer',
+                error: err
+            });
+        }
     },
 
     showAnswerPost: function (req, res) {
@@ -126,7 +125,6 @@ module.exports = {
      */
     remove: function (req, res) {
         var id = req.params.id;
-        const loggedIn = req.session.userId ? true : false;
         AnswerModel.findByIdAndRemove(id, function (err, answer) {
             if (err) {
                 return res.status(500).json({
@@ -135,7 +133,7 @@ module.exports = {
                 });
             }
 
-            return res.render('feedback', {message: 'Answer deleted successfully!', loggedIn: loggedIn});
+            return res.render('feedback', {message: 'Answer deleted successfully!'});
         });
     },
 
@@ -171,19 +169,17 @@ module.exports = {
     showPostComment: async function (req, res) {
 
         var id = req.params.id;
-        const loggedIn = req.session.userId ? true : false;
-        return res.render('answers/comment', {aid: id, loggedIn: loggedIn})
+        return res.render('answers/comment', {aid: id})
 
     },
 
     postComment: async function (req, res) {
 
         var id = req.params.id;
-        const loggedIn = req.session.userId ? true : false;
 
         await AnswerModel.findOneAndUpdate({_id: id}, {$push: {comments: req.body.description}});
 
-        return res.render('feedback', {message: "Comment published successfully!", loggedIn: loggedIn})
+        return res.render('feedback', {message: "Comment published successfully!"})
 
     },
 

@@ -1,6 +1,7 @@
 var UserModel = require('../models/userModel.js');
 var QuestionModel = require('../models/questionModel.js');
 var AnswerModel = require('../models/answerModel.js');
+
 /**
  * userController.js
  *
@@ -72,18 +73,16 @@ module.exports = {
     },
 
     showLogin: function (req, res) {
-        const loggedIn = req.session.userId ? true : false;
-        res.render('users/login', {loggedIn: loggedIn});
+        res.render('users/login');
     },
 
     showRegister: function (req, res) {
-        const loggedIn = req.session.userId ? true : false;
         if (req.session.userId) {
             var err = new Error("You are logged in!");
             err.status = 401;
             return next(err);
         }
-        res.render('users/register', {loggedIn: loggedIn});
+        res.render('users/register');
     },
 
     login: function (req, res, next) {
@@ -94,7 +93,7 @@ module.exports = {
                 return next(err);
             } else {
                 req.session.userId = user._id;
-                return res.redirect('profile');
+                return res.redirect(user.username);
             }
         })
     },
@@ -111,25 +110,58 @@ module.exports = {
         }
     },
 
-    showProfile: function (req, res, next) {
-        const loggedIn = req.session.userId ? true : false;
+    // showProfile: function (req, res, next) {
+    //     const loggedIn = req.session.userId ? true : false;
+    //
+    //     UserModel.findById(req.session.userId)
+    //         .exec(async function (error, user) {
+    //             if (error) {
+    //                 return next(error);
+    //             } else {
+    //                 if (user == null) {
+    //                     var err = new Error('Not authorized! Go back!');
+    //                     err.status = 400;
+    //                     return next(err);
+    //                 } else {
+    //                     questionCount = await QuestionModel.countDocuments({userid: req.session.userId});
+    //                     answerCount = await AnswerModel.countDocuments({uid: req.session.userId});
+    //                     res.render('users/profile', {
+    //                         user: user,
+    //                         qs: questionCount,
+    //                         loggedIn: loggedIn,
+    //                         as: answerCount
+    //                     });
+    //                 }
+    //             }
+    //         });
+    // },
 
-        UserModel.findById(req.session.userId)
+    showProfile: function (req, res, next) {
+        const validUsernameRegex = /^[a-zA-Z0-9_]+$/;
+        const username = req.params.username;
+
+        if (!validUsernameRegex.test(username)) {
+            const err = new Error('Invalid username format');
+            err.status = 400;
+            return next(err);
+        }
+
+        UserModel.findOne({ username: username })
             .exec(async function (error, user) {
                 if (error) {
                     return next(error);
                 } else {
-                    if (user == null) {
-                        var err = new Error('Not authorized! Go back!');
-                        err.status = 400;
+                    if (!user) {
+                        const err = new Error('User not found');
+                        err.status = 404;
                         return next(err);
                     } else {
-                        questionCount = await QuestionModel.countDocuments({userid: req.session.userId});
-                        answerCount = await AnswerModel.countDocuments({uid: req.session.userId});
+                        const questionCount = await QuestionModel.countDocuments({ userid: user._id });
+                        const answerCount = await AnswerModel.countDocuments({ uid: user._id });
+
                         res.render('users/profile', {
                             user: user,
                             qs: questionCount,
-                            loggedIn: loggedIn,
                             as: answerCount
                         });
                     }

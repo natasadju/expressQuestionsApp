@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const UserModel = require('./models/userModel');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/userRoutes');
@@ -42,6 +43,27 @@ app.use(session({
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
+// Middleware to attach user object to response locals if authenticated
+function attachUser(req, res, next) {
+    if (req.session.userId) {
+        UserModel.findById(req.session.userId, function (err, user) {
+            if (err || !user) {
+                // Handle error or user not found
+                next();
+            } else {
+                // Attach the user object to response locals
+                res.locals.user = user;
+                next();
+            }
+        });
+    } else {
+        next();
+    }
+}
+
+// Add attachUser middleware to the middleware stack
+app.use(attachUser);
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
@@ -59,7 +81,7 @@ app.use(function (req, res, next) {
 });
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use(function (err, req, res) {
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
