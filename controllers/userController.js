@@ -232,7 +232,7 @@ module.exports = {
                     error: err
                 });
             }
-            return res.redirect('/users/profile');
+            return res.redirect('/users/' + user.username);
 
         });
     }
