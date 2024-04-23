@@ -156,8 +156,10 @@ module.exports = {
 
                 await votes.save();
             }
+
             // just the same page but with the message voted
             return res.render('feedback', {message: 'Voted successfully!'});
+            // return res.redirect(`/questions/show/`);
         } catch (err) {
             return res.status(500).json({
                 message: 'Error when voting',

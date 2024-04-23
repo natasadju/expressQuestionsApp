@@ -12,13 +12,6 @@ var answersRouter = require('./routes/answerRoutes');
 
 var app = express();
 
-const hbs = require('hbs');
-
-hbs.registerHelper('eq', function (a, b) {
-    return a === b;
-});
-
-
 var mongoose = require('mongoose');
 var mongoDB = 'mongodb://localhost:27017/vaja3';
 

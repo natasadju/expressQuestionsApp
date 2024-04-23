@@ -31,53 +31,12 @@ module.exports = {
      * questionController.show()
      */
     show: async function (req, res) {
-        var id = req.params.id;
-        const loggedIn = req.session.userId ? true : false;
+        const questionId = req.params.id;
+        const userLoggedIn = req.session.userId ? true : false;
 
-        await QuestionModel.findOneAndUpdate({_id: id}, {$inc: {views: 1}})
+        await QuestionModel.findOneAndUpdate({_id: questionId}, {$inc: {views: 1}});
 
-        const question = await QuestionModel.findOne({_id: id}).populate('userid');
-        const answers = await AnswerModel.find({qid: id, chosen: false}).populate('uid');
-        const correctAnswer = await AnswerModel.findOne({qid: id, chosen: true}).populate('uid');
-        var correctAnswerVotes = [];
-
-        if (correctAnswer) {
-            correctAnswerVotes = await VotesModel.find({aid: correctAnswer._id});
-
-            // Check if the logged-in user has already voted positively or negatively on the correct answer
-            var votedPositively = correctAnswerVotes.some(vote => vote.uid.toString() === req.session.userId && vote.upvote);
-            var votedNegatively = correctAnswerVotes.some(vote => vote.uid.toString() === req.session.userId && !vote.upvote);
-            correctAnswer.votedPositively = votedPositively;
-            correctAnswer.votedNegatively = votedNegatively;
-        }
-
-        var answers2 = []
-
-        for (const answer of answers) {
-            var votes = await VotesModel.find({aid: answer._id});
-
-            var answerOwner = answer.uid._id.toString() === req.session.userId;
-            var questionOwner = question.userid._id.toString() === req.session.userId;
-
-            var votedPositively = votes.some(vote => vote.uid.toString() === req.session.userId && vote.upvote);
-            var votedNegatively = votes.some(vote => vote.uid.toString() === req.session.userId && !vote.upvote);
-
-            answers2.push({
-                description: answer.description,
-                uid: answer.uid,
-                _id: answer._id,
-                datetime: answer.datetime,
-                upvotes: votes.filter(vote => vote.upvote).length,
-                downvotes: votes.filter(vote => !vote.upvote).length,
-                comments: answer.comments ? answer.comments : [],
-                answerOwner: answerOwner,
-                questionOwner: questionOwner,
-                loggedIn: loggedIn,
-                votedPositively: votedPositively,
-                votedNegatively: votedNegatively
-            })
-        }
-
+        const question = await QuestionModel.findOne({_id: questionId}).populate('userid');
         if (!question) {
             return res.status(500).json({
                 message: 'Error. Question does not exist!',
@@ -85,21 +44,59 @@ module.exports = {
             });
         }
 
-        var questionOwner = question.userid._id.toString() === req.session.userId;
+        const answers = await AnswerModel.find({qid: questionId, chosen: false}).populate('uid');
+        const correctAnswer = await AnswerModel.findOne({qid: questionId, chosen: true}).populate('uid');
 
-        var correctAnswerUPVotes = correctAnswerVotes.filter(vote => vote.upvote).length;
-        var correctAnswerDOWNVotes = correctAnswerVotes.filter(vote => !vote.upvote).length;
+        async function getVotes(answer) {
+            const votes = await VotesModel.find({aid: answer._id});
+            return {
+                votes,
+                votedPositively: votes.some(vote => vote.uid.toString() === req.session.userId && vote.upvote),
+                votedNegatively: votes.some(vote => vote.uid.toString() === req.session.userId && !vote.upvote)
+            };
+        }
+
+        const enhancedAnswers = await Promise.all(answers.map(async answer => {
+            const {votes, votedPositively, votedNegatively} = await getVotes(answer);
+            return {
+                description: answer.description,
+                uid: answer.uid,
+                _id: answer._id,
+                datetime: answer.datetime,
+                upvotes: votes.filter(vote => vote.upvote).length,
+                downvotes: votes.filter(vote => !vote.upvote).length,
+                comments: answer.comments ? answer.comments : [],
+                answerOwner: answer.uid._id.toString() === req.session.userId,
+                questionOwner: question.userid._id.toString() === req.session.userId,
+                loggedIn: userLoggedIn,
+                votedPositively,
+                votedNegatively
+            };
+        }));
+
+        let correctAnswerVotes = [];
+        let correctAnswerUPVotes = 0;
+        let correctAnswerDOWNVotes = 0;
+
+        if (correctAnswer) {
+            correctAnswerVotes = await getVotes(correctAnswer);
+            correctAnswerUPVotes = correctAnswerVotes.votes.filter(vote => vote.upvote).length;
+            correctAnswerDOWNVotes = correctAnswerVotes.votes.filter(vote => !vote.upvote).length;
+        }
+
+        const questionOwner = question.userid._id.toString() === req.session.userId;
 
         return res.render('questions/show', {
             data: question,
-            answers: answers2,
-            correctAnswer: correctAnswer,
-            correctAnswerUPVotes: correctAnswerUPVotes,
-            correctAnswerDOWNVotes: correctAnswerDOWNVotes,
-            loggedIn: loggedIn,
-            questionOwner: questionOwner
+            answers: enhancedAnswers,
+            correctAnswer,
+            correctAnswerUPVotes,
+            correctAnswerDOWNVotes,
+            loggedIn: userLoggedIn,
+            questionOwner
         });
     },
+
 
     showAddQuestion: function (req, res) {
 
